@@ -1,0 +1,35 @@
+{
+    "Action": [
+        "Name"
+    ],
+    "BNpcName": [
+        "Singular"
+    ],
+    "DynamicEvent": [
+        "Name",
+        "Description"
+    ],
+    "Fate": [
+        "Name",
+        "Description"
+    ],
+    "InstanceContentTextData": [
+        "Text"
+    ],
+    "LogMessage": [
+        "Text"
+    ],
+    "NpcYell": [
+        "Text"
+    ],
+    "PlaceName": [
+        "Name"
+    ],
+    "PublicContentTextData": [
+        "TextData"
+    ],
+    "Status": [
+        "Name",
+        "Description"
+    ]
+}
