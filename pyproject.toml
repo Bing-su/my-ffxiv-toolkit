@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "ffxiv_ko_en_data_concat"
+version = "0.1.0"
+description = "파판 영어, 한국어 데이터 마이닝 정보를 하나의 파일로 합치는 프로그램"
+authors = ["Bingsu <ks2515@naver.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "*"
+pandas = "^1.4"
+openpyxl = "*"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+flake8 = "*"
+flake8-bugbear = "*"
+mypy = "*"
+isort = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
