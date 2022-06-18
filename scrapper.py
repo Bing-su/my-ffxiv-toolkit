@@ -23,6 +23,9 @@ class FFXIVDataScrapper:
         df = pd.read_csv(
             url, usecols=columns, skiprows=[0, 2], index_col=0, low_memory=False
         )
+
+        rename = {col: f"{col}_{lang}" for col in self.info[name]}
+        df.rename(columns=rename, inplace=True)
         return df
 
     def make_concat_df(self, name: str) -> pd.DataFrame:
