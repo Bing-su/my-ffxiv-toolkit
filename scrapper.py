@@ -1,10 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from io import StringIO
 from typing import Literal, Optional
 
 import pandas as pd
-import requests
 
 
 class FFXIVDataScrapper:
@@ -22,10 +20,8 @@ class FFXIVDataScrapper:
         base_url = self.KO_BASE_URL if lang == "ko" else self.EN_BASE_URL
         url = f"{base_url}/{name}.csv"
         columns = ["#"] + self.info[name]
-        resp = requests.get(url).text
-        data = StringIO(resp)
         df = pd.read_csv(
-            data, usecols=columns, skiprows=1, index_col=0, low_memory=False
+            url, usecols=columns, skiprows=[0, 2], index_col=0, low_memory=False
         )
         return df
 
