@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 continue
 
             ko_skill_name = match_skills.iloc[-1][col_ko]
-            row = f"    '{en_skill_name_raw}': '{ko_skill_name}',\n"
+            row = f"  '{en_skill_name_raw}': '{ko_skill_name}',\n"
             outputs.write(row)
         else:
             outputs.write(line)
