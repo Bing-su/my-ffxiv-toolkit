@@ -1,13 +1,7 @@
-.PHONY: fetch compare compare-npc compare-place
+.PHONY: fetch compare
 
 fetch:
 	python main.py
 
 compare:
-	python compare.py
-
-compare-npc:
-	python compare.py -n
-
-compare-place:
-	python compare.py -p
+	python compare.py -a
