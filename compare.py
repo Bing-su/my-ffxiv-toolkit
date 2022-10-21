@@ -63,6 +63,8 @@ def compare(
 
             len_space = len(m.group("space"))
             ko_name = match_skills.iloc[-1][col_ko]
+            if "_rsv_" in ko_name:
+                ko_name = en_name_raw
             row = " " * len_space + f"'{en_name_raw}': '{ko_name}',\n"
             outputs.write(row)
         else:
