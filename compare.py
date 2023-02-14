@@ -53,9 +53,12 @@ def compare(
             en_name = en_name_raw.replace("\\'", "'")
             en_name = re.sub(r"\(.*\)", "", en_name)
             lower_data = data[col_en].str.lower()
-            match_skills = data[
-                (lower_data == en_name.lower()) & (data[col_ko].notna())
-            ]
+            data_index = (
+                (lower_data == en_name.lower())
+                & (data[col_ko].notna())
+                & ~(data[col_ko].str.startswith("_rsv_", na=False))
+            )
+            match_skills = data[data_index]
 
             if len(match_skills) == 0:
                 outputs.write(line)
