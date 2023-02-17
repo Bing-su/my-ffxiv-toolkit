@@ -1,8 +1,10 @@
-from concurrent.futures import ThreadPoolExecutor
+from __future__ import annotations
+
 from functools import partial
-from typing import Literal, Optional
+from typing import Literal
 
 import pandas as pd
+from mpire import WorkerPool
 
 
 class FFXIVDataScrapper:
@@ -33,16 +35,16 @@ class FFXIVDataScrapper:
         cat_df = pd.concat(dfs, axis=1)
         return cat_df
 
-    def scrap(self, save_dir: Optional[str] = None) -> None:
+    def scrap(self, save_dir: str | None = None) -> None:
         if save_dir is None:
             save_dir = self.save_dir
 
         save_func = partial(self.save, save_dir=save_dir)
-        with ThreadPoolExecutor() as executor:
-            dfs = tuple(executor.map(self.make_concat_df, self.names))
-            executor.map(save_func, dfs, self.names)
+        with WorkerPool() as pool:
+            dfs = tuple(pool.map(self.make_concat_df, self.names, progress_bar=True))
+            pool.map(save_func, zip(dfs, self.names), len(dfs), progress_bar=True)
 
-    def save(self, df: pd.DataFrame, name: str, save_dir: Optional[str] = None) -> None:
+    def save(self, df: pd.DataFrame, name: str, save_dir: str | None = None) -> None:
         if save_dir is None:
             save_dir = self.save_dir
         path = f"{save_dir}/{name}.xlsx"

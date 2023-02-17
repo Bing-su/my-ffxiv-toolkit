@@ -5,6 +5,10 @@
     "BNpcName": [
         "Singular"
     ],
+    "Completion": [
+        "Text",
+        "GroupTitle"
+    ],
     "DynamicEvent": [
         "Name",
         "Description"
