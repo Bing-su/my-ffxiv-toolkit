@@ -14,7 +14,7 @@ mpire = "*"
 nari = { git = "https://github.com/xivlogs/nari.git" }
 nari-act = { git = "https://github.com/xivlogs/nari-act.git" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "*"
 ruff = "*"
 flake8-bugbear = "*"
