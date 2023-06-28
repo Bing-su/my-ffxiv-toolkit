@@ -5,6 +5,9 @@
     "BNpcName": [
         "Singular"
     ],
+    "Balloon": [
+        "Dialogue"
+    ],
     "Completion": [
         "Text",
         "GroupTitle"
