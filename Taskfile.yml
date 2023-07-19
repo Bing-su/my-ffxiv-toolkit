@@ -1,0 +1,24 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: Hello, FFXIV!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  fetch:
+    cmds:
+      - python main.py
+
+  compare:
+    cmds:
+      - python compare.py -a
+
+  lint:
+    cmds:
+      - pre-commit run -a
