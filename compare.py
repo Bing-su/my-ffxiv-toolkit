@@ -13,8 +13,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-a", "--all", action="store_true")
     parser.add_argument("-i", "--input", default="input.txt")
     parser.add_argument("-o", "--output", default="output.txt")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def compare(

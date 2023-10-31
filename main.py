@@ -11,8 +11,7 @@ def parse_args() -> argparse.Namespace:
         "-j", "--json", default="default.json", help="스크랩 정보를 담은 json파일의 경로"
     )
     parser.add_argument("-p", "--path", default="./data", help="결과 파일 저장 경로")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
