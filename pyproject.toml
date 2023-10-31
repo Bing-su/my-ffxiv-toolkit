@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ffxiv_ko_en_data_concat"
-version = "0.2.0"
+version = "0.2.1"
 description = "파판 영어, 한국어 데이터 마이닝 정보를 하나의 파일로 합치는 프로그램"
 authors = ["Bingsu <ks2515@naver.com>"]
 license = "MIT"
@@ -17,9 +17,6 @@ nari-act = { git = "https://github.com/xivlogs/nari-act.git" }
 [tool.poetry.group.dev.dependencies]
 black = "*"
 ruff = "*"
-flake8-bugbear = "*"
-mypy = "*"
-isort = "*"
 pre-commit = "*"
 ipykernel = "*"
 
