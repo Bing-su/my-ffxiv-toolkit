@@ -49,7 +49,7 @@ def compare(
     for line in inputs:
         if m := pattern.search(line):
             en_name_raw = m.group("en")
-            en_name = en_name_raw.replace("\\'", "'")
+            en_name = en_name_raw.replace("\\'", "'").replace("Pandaemon", "Pandæmon")
             en_name = re.sub(r"\(.*\)", "", en_name)
             lower_data = data[col_en].str.lower()
             data_index = (
