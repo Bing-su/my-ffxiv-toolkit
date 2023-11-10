@@ -56,6 +56,7 @@ async def download(config: dict[str, list[str]]) -> TaskDict:
                 tasks[lang].append(task)
                 task.add_done_callback(lambda _: pbar1.update(1))
 
+    pbar1.close()
     return tasks
 
 
@@ -72,6 +73,8 @@ async def concat_and_save(tasks: TaskDict, save_dir: Path) -> None:
             save_path = save_dir.joinpath(f"{name}.xlsx")
             task = tg.create_task(asyncio.to_thread(df.to_excel, save_path))
             task.add_done_callback(lambda _: pbar2.update(1))
+
+    pbar2.close()
 
 
 async def scrap(
