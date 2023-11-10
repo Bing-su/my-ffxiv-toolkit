@@ -1,18 +1,18 @@
 [tool.poetry]
-name = "ffxiv_ko_en_data_concat"
-version = "0.2.1"
-description = "파판 영어, 한국어 데이터 마이닝 정보를 하나의 파일로 합치는 프로그램"
+name = "bingkit-ffxiv"
+version = "0.3.0.pre0"
+description = "개인용 FF14 툴킷"
 authors = ["Bingsu <ks2515@naver.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-pandas = "*"
-openpyxl = "*"
+python = "^3.9"
+pandas = { version = "^2.0", extras = ["excel"] }
+polars = { version = "^0.19", extras = ["pandas"] }
 tqdm = "*"
-mpire = "*"
-nari = { git = "https://github.com/xivlogs/nari.git" }
-nari-act = { git = "https://github.com/xivlogs/nari-act.git" }
+loguru = "*"
+winloop = { version = "*", markers = "platform_system == 'Windows'" }
+taskgroup = { version = "*", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
