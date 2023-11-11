@@ -13,7 +13,15 @@ tasks:
 
   fetch:
     cmds:
-      - python main.py
+      - bingkit-ffxiv scrap
+
+  replace:
+    cmds:
+      - bingkit-ffxiv replace
+
+  rsv:
+    cmds:
+      - bingkit-ffxiv rsv
 
   compare:
     cmds:
