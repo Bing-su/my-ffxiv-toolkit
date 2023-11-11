@@ -4,7 +4,6 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import TypedDict
 
 import pandas as pd
 from tqdm.auto import tqdm
@@ -19,11 +18,6 @@ base_url = {
     "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/master/csv",
 }
 here = Path(__file__).parent
-
-
-class TaskDict(TypedDict):
-    en: list[asyncio.Task[pd.DataFrame]]
-    ko: list[asyncio.Task[pd.DataFrame]]
 
 
 async def read_url(lang: str, name: str, columns: list[str]) -> pd.DataFrame:
