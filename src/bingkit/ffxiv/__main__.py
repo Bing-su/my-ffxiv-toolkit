@@ -5,6 +5,7 @@ from typer import Argument, Option, Typer
 from typing_extensions import Annotated
 
 from bingkit.ffxiv.rsv import parse_log as _parse_log
+from bingkit.ffxiv.rsv import replace as _replace
 from bingkit.ffxiv.scrap import scrap as _scrap
 
 app = Typer(no_args_is_help=True)
@@ -20,7 +21,7 @@ def rsv(
     _parse_log(files, save_path)
 
 
-@app.command(no_args_is_help=True)
+@app.command()
 def scrap(
     config_path: Annotated[
         Optional[str], Option("-c", "--config-path", help="다운로드 설정 json 파일 경로")
@@ -30,6 +31,18 @@ def scrap(
     ] = None,
 ):
     asyncio.run(_scrap(config_path, save_dir))
+
+
+@app.command()
+def replace(
+    data_dir: Annotated[
+        Optional[str], Option("-d", "--data-dir", help="데이터 파일을 담은 폴더 경로")
+    ] = None,
+    rsv_path: Annotated[
+        Optional[str], Option("-r", "--rsv-path", help="RSV 정보를 담은 json 파일")
+    ] = None,
+):
+    asyncio.run(_replace(data_dir, rsv_path))
 
 
 if __name__ == "__main__":
