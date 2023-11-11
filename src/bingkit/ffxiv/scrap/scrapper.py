@@ -14,10 +14,10 @@ if sys.version_info >= (3, 11):
 else:
     import taskgroups as taskgroups
 
-KO_BASE_URL = (
-    "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/master/csv"
-)
-EN_BASE_URL = "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv"
+base_url = {
+    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv",
+    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/master/csv",
+}
 here = Path(__file__).parent
 
 
@@ -26,12 +26,9 @@ class TaskDict(TypedDict):
     ko: list[asyncio.Task[pd.DataFrame]]
 
 
-async def url_to_df(name: str, columns: list[str], lang: str) -> pd.DataFrame:
-    base_url = KO_BASE_URL if lang == "ko" else EN_BASE_URL
-    url = f"{base_url}/{name}.csv"
-    columns = ["#", *columns]
-
-    df = await asyncio.to_thread(
+async def read_url(lang: str, name: str, columns: list[str]) -> pd.DataFrame:
+    url = f"{base_url[lang]}/{name}.csv"
+    return await asyncio.to_thread(
         pd.read_csv,
         url,
         usecols=columns,
@@ -40,41 +37,25 @@ async def url_to_df(name: str, columns: list[str], lang: str) -> pd.DataFrame:
         low_memory=False,
     )
 
-    rename = {col: f"{col}_{lang}" for col in columns}
-    df.rename(columns=rename, inplace=True)
-    return df
 
+async def make_df(name: str, columns: list[str], save_dir: Path) -> None:
+    columns = ["#", *columns]
+    langs = ("en", "ko")
 
-async def download(config: dict[str, list[str]]) -> TaskDict:
-    pbar1 = tqdm(total=len(config) * 2, desc="Scraping")
-    tasks = TaskDict({"en": [], "ko": []})
-
+    tasks = []
     async with taskgroups.TaskGroup() as tg:
-        for lang in ("en", "ko"):
-            for name, columns in config.items():
-                task = tg.create_task(url_to_df(name, columns, lang), name=name)
-                tasks[lang].append(task)
-                task.add_done_callback(lambda _: pbar1.update(1))
+        for lang in langs:
+            coro = read_url(lang, name, columns)
+            tasks.append(tg.create_task(coro))
 
-    pbar1.close()
-    return tasks
+    dfs = [task.result() for task in tasks]
+    for i, lang in enumerate(langs):
+        rename = {col: f"{col}_{lang}" for col in columns}
+        dfs[i].rename(columns=rename, inplace=True)
 
-
-async def concat_and_save(tasks: TaskDict, save_dir: Path) -> None:
-    pbar2 = tqdm(total=len(tasks["en"]), desc="Saving")
-    save_dir.mkdir(exist_ok=True)
-
-    async with taskgroups.TaskGroup() as tg:
-        for task_en, task_ko in zip(tasks["en"], tasks["ko"], strict=True):
-            en, ko = task_en.result(), task_ko.result()
-            name = task_en.get_name()
-            df = pd.concat([en, ko], axis=1)
-
-            save_path = save_dir.joinpath(f"{name}.xlsx")
-            task = tg.create_task(asyncio.to_thread(df.to_excel, save_path))
-            task.add_done_callback(lambda _: pbar2.update(1))
-
-    pbar2.close()
+    df = pd.concat(dfs, axis=1)
+    save_path = save_dir.joinpath(f"{name}.xlsx")
+    await asyncio.to_thread(df.to_excel, save_path)
 
 
 async def scrap(
@@ -86,5 +67,10 @@ async def scrap(
     config: dict[str, list[str]] = json.loads(config_path.read_bytes())
     save_dir = Path().cwd().joinpath("data") if save_dir is None else Path(save_dir)
 
-    tasks = await download(config)
-    await concat_and_save(tasks, save_dir)
+    pbar = tqdm(total=len(config), desc="Scraping")
+    async with taskgroups.TaskGroup() as tg:
+        for name, columns in config.items():
+            coro = make_df(name, columns, save_dir)
+            task = tg.create_task(coro)
+            task.add_done_callback(lambda _: pbar.update(1))
+    pbar.close()
