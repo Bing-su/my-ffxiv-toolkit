@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import fileinput
+import glob
 import json
 import re
 from pathlib import Path
@@ -21,27 +23,25 @@ def parse_rsv_line(line: str) -> RSVData:
     return RSVData(key, value)
 
 
-def parse_log(log_file: str | Path, save_dir: str | Path | None):
-    save_dir = Path.cwd() if save_dir is None else Path(save_dir)
+def convert_files(patterns: list[str]) -> list[Path]:
+    return [
+        p
+        for pattern in patterns
+        for file in glob.glob(pattern)  # noqa: PTH207
+        if (p := Path(file)).is_file()
+    ]
+
+
+def parse_log(file_patterns: list[str], save_path: str | Path | None):
+    save_path = Path("rsv.json") if save_path is None else Path(save_path)
     mapping = {}
 
-    with Path(log_file).open("r", encoding="utf-8") as file:
-        for line in file:
+    with fileinput.input(files=convert_files(file_patterns), encoding="utf-8") as files:
+        for line in files:
             if not is_rsv_line(line):
                 continue
             rsv = parse_rsv_line(line)
             mapping[rsv.key] = rsv.value
 
-    save_path = save_dir.joinpath("rsv.json")
     with save_path.open("w", encoding="utf-8") as file:
         json.dump(mapping, file, indent=2, ensure_ascii=False)
-
-
-def cli(log_file: str, save_dir: str = "."):
-    parse_log(log_file, save_dir)
-
-
-if __name__ == "__main__":
-    import typer
-
-    typer.run(cli)
