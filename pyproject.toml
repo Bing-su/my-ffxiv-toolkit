@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bingkit-ffxiv"
-version = "0.3.0.pre0"
+version = "0.3.0.pre1"
 description = "개인용 FF14 툴킷"
 authors = ["Bingsu <ks2515@naver.com>"]
 license = "MIT"
@@ -24,6 +24,9 @@ ipykernel = "*"
 [[tool.poetry.packages]]
 include = "bingkit"
 from = "src"
+
+[tool.poetry.scripts]
+bingkit-ffxiv = "bingkit.ffxiv.__main__:app"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
