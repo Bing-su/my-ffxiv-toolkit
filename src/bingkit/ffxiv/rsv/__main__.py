@@ -36,7 +36,11 @@ def parse_log(file_patterns: list[str], save_path: str | Path | None):
     save_path = Path("rsv.json") if save_path is None else Path(save_path)
     mapping = {}
 
-    with fileinput.input(files=convert_files(file_patterns), encoding="utf-8") as files:
+    converted_files = convert_files(file_patterns)
+    if not converted_files:
+        return
+
+    with fileinput.input(files=converted_files, encoding="utf-8") as files:
         for line in files:
             if not is_rsv_line(line):
                 continue
