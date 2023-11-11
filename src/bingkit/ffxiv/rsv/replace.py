@@ -31,6 +31,10 @@ async def replace(
     data_dir = Path("data") if data_dir is None else Path(data_dir)
     rsv_path = Path("rsv.json") if rsv_path is None else Path(rsv_path)
 
+    if not rsv_path.exists():
+        msg = f"{rsv_path!r} does not exist"
+        raise FileNotFoundError(msg)
+
     rsv_mapping = get_rsv_mapping(rsv_path)
     files = list(data_dir.rglob("*.xlsx"))
     pbar = tqdm(total=len(files), desc="RSV Replacing")
