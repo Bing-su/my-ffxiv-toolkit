@@ -13,6 +13,7 @@ tqdm = "*"
 loguru = "*"
 winloop = { version = "*", markers = "platform_system == 'Windows'" }
 taskgroup = { version = "*", python = "<3.11" }
+typer = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
