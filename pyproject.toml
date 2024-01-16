@@ -7,13 +7,13 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pandas = { version = "^2.0", extras = ["excel"] }
-polars = { version = "^0.19", extras = ["pandas"] }
+pandas = { version = "*", extras = ["excel"] }
+polars = { version = "*", extras = ["pandas"] }
 tqdm = "*"
 loguru = "*"
 winloop = { version = "*", markers = "platform_system == 'Windows'" }
 taskgroup = { version = "*", python = "<3.11" }
-typer = "^0.9.0"
+typer = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
