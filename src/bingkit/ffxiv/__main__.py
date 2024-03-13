@@ -24,7 +24,8 @@ def rsv(
 @app.command()
 def scrap(
     config_path: Annotated[
-        Optional[str], Option("-c", "--config-path", help="다운로드 설정 json 파일 경로")
+        Optional[str],
+        Option("-c", "--config-path", help="다운로드 설정 json 파일 경로"),
     ] = None,
     save_dir: Annotated[
         Optional[str], Option("-d", "--save-dir", help="파일들을 저장할 폴더")
