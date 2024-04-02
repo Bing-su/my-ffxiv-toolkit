@@ -60,6 +60,7 @@ async def scrap(
     )
     config: dict[str, list[str]] = json.loads(config_path.read_bytes())
     save_dir = Path.cwd().joinpath("data") if save_dir is None else Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
 
     pbar = tqdm(total=len(config), desc="Scraping")
     async with taskgroups.TaskGroup() as tg:
