@@ -1,42 +1,14 @@
 {
-    "Action": [
-        "Name"
-    ],
-    "BNpcName": [
-        "Singular"
-    ],
-    "Balloon": [
-        "Dialogue"
-    ],
-    "Completion": [
-        "Text",
-        "GroupTitle"
-    ],
-    "DynamicEvent": [
-        "Name",
-        "Description"
-    ],
-    "Fate": [
-        "Name",
-        "Description"
-    ],
-    "InstanceContentTextData": [
-        "Text"
-    ],
-    "LogMessage": [
-        "Text"
-    ],
-    "NpcYell": [
-        "Text"
-    ],
-    "PlaceName": [
-        "Name"
-    ],
-    "PublicContentTextData": [
-        "TextData"
-    ],
-    "Status": [
-        "Name",
-        "Description"
-    ]
+  "Action": ["Name"],
+  "BNpcName": ["Singular"],
+  "Balloon": ["Dialogue"],
+  "Completion": ["Text", "GroupTitle"],
+  "DynamicEvent": ["Name", "Description"],
+  "Fate": ["Name", "Description"],
+  "InstanceContentTextData": ["Text"],
+  "LogMessage": ["Text"],
+  "NpcYell": ["Text"],
+  "PlaceName": ["Name"],
+  "PublicContentTextData": ["TextData"],
+  "Status": ["Name", "Description"]
 }
