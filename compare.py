@@ -88,14 +88,14 @@ if __name__ == "__main__":
 
     else:
         pbar = tqdm(total=3)
-        compare(action=True, input_file=args.input, output_file="output_action.txt")
+        compare(npc=True, input_file=args.input, output_file="output_npc.txt")
         pbar.update()
-        compare(npc=True, input_file="output_action.txt", output_file="output_npc.txt")
+        compare(place=True, input_file="output_npc.txt", output_file="output_place.txt")
         pbar.update()
-        compare(place=True, input_file="output_npc.txt", output_file=args.output)
+        compare(action=True, input_file="output_place.txt", output_file="output.txt")
         pbar.update()
 
-        for file in ["output_action.txt", "output_npc.txt"]:
+        for file in ["output_place.txt", "output_npc.txt"]:
             os.remove(file)
 
         pbar.close()
