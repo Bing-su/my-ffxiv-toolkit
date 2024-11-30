@@ -18,7 +18,7 @@ typer = "*"
 [tool.poetry.group.dev.dependencies]
 black = "*"
 ruff = "*"
-pre-commit = "*"
+pre-commit-uv = "*"
 ipykernel = "*"
 
 [[tool.poetry.packages]]
