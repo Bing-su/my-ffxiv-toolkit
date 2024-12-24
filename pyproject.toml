@@ -18,13 +18,6 @@ dependencies = [
 [dependency-groups]
 dev = ["ruff", "pre-commit-uv", "ipykernel"]
 
-[tool.poetry]
-name = "bingkit-ffxiv"
-version = "0.3.0"
-description = "개인용 FF14 툴킷"
-authors = ["Bingsu <ks2515@naver.com>"]
-license = "MIT"
-
 [project.scripts]
 bingkit-ffxiv = "bingkit.ffxiv.__main__:app"
 
