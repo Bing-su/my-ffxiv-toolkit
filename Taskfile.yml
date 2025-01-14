@@ -30,3 +30,7 @@ tasks:
   lint:
     cmds:
       - pre-commit run -a
+
+  update:
+    cmds:
+      - uv sync --upgrade --all-extras --all-groups
