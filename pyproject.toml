@@ -7,7 +7,7 @@ requires-python = ">=3.10"
 license = "MIT"
 dependencies = [
     "pandas[excel]",
-    "polars[pandas]",
+    "polars[pandas,fsspec,excel]",
     "tqdm",
     "loguru",
     "winloop; platform_system == 'Windows'",
