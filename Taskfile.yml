@@ -21,7 +21,7 @@ tasks:
 
   rsv:
     cmds:
-      - bingkit-ffxiv rsv
+      - bingkit-ffxiv rsv {{ .CLI_ARGS }}
 
   compare:
     cmds:
