@@ -5,6 +5,7 @@ from typing import Annotated
 from typer import Argument, Option, Typer
 
 from bingkit.ffxiv.coinach import coinach as _coinach
+from bingkit.ffxiv.raidboss import raidboss as _raidboss
 from bingkit.ffxiv.rsv import parse_log as _parse_log
 from bingkit.ffxiv.rsv import replace as _replace
 from bingkit.ffxiv.scrap import scrap as _scrap
@@ -55,6 +56,14 @@ def coinach(
     ] = Path("coinach"),
 ):
     _coinach(output, name)
+
+
+@app.command()
+def raidboss(
+    url: Annotated[str, Argument(help="파싱할 Cactbot raw content URL")],
+):
+    result = _raidboss(url)
+    print(result)
 
 
 if __name__ == "__main__":
