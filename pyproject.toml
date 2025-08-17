@@ -3,7 +3,7 @@ name = "bingkit-ffxiv"
 version = "0.4.0"
 description = "개인용 FF14 툴킷"
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 dependencies = [
     "pandas[excel]",
@@ -13,6 +13,7 @@ dependencies = [
     "winloop; platform_system == 'Windows'",
     "taskgroup; python_version < '3.11'",
     "typer",
+    "httpx",
 ]
 
 [dependency-groups]
