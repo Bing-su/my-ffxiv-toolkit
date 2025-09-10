@@ -93,11 +93,15 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
         df = actions.iloc[:, [0, i + 1]]
         for act in data.action:
             row = df[df.iloc[:, 0].str.lower() == act.lower()]
+            if row.empty:
+                continue
             action.append(row.iloc[-1, 1])
 
         df = b_npc_names.iloc[:, [0, i + 1]]
         for bnpc in data.bnpcname:
             row = df[df.iloc[:, 0].str.lower() == bnpc.lower()]
+            if row.empty:
+                continue
             bnpcname.append(row.iloc[-1, 1])
         result[lang] = ParsedData(action=action, bnpcname=bnpcname)
 
