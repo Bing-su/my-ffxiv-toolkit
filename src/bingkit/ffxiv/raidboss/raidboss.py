@@ -23,11 +23,27 @@ class ParsedData:
     bnpcname: list[str]
 
 
+@dataclass
+class PairData:
+    action: dict[str, str]
+    bnpcname: dict[str, str]
+
+
 class RaidbossDataDict(TypedDict):
-    en: ParsedData
-    de: ParsedData
-    fr: ParsedData
-    ja: ParsedData
+    en: PairData
+    de: PairData
+    fr: PairData
+    ja: PairData
+
+
+def add_to_set(s: set[str], item: str | list[str]) -> set[str]:
+    s = s.copy()
+    if isinstance(item, list):
+        for i in item:
+            s.add(i.strip())
+    else:
+        s.add(item.strip())
+    return s
 
 
 def fetch(url: str) -> RaidbossData:
@@ -60,7 +76,7 @@ def parse(data: RaidbossData) -> ParsedData:
         except json5.JSON5DecodeError:
             continue
         if "source" in obj:
-            bnpcname.add(obj["source"])
+            bnpcname = add_to_set(bnpcname, obj["source"])
 
     for line in data.txt.splitlines():
         if not re.match(r"^\d", line):
@@ -68,7 +84,7 @@ def parse(data: RaidbossData) -> ParsedData:
         m1 = quoted.search(line)
         if m1:
             s = pp_action(m1.group(1))
-            action.update(s)
+            action = add_to_set(action, s)
         m2 = ts_object.search(line)
         if m2:
             try:
@@ -76,7 +92,8 @@ def parse(data: RaidbossData) -> ParsedData:
             except json5.JSON5DecodeError:
                 continue
             if "source" in obj:
-                bnpcname.add(obj["source"])
+                source = obj["source"]
+                bnpcname = add_to_set(bnpcname, source)
 
     return ParsedData(action=sorted(action), bnpcname=sorted(bnpcname))
 
@@ -85,25 +102,29 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
     actions = pd.read_excel("coinach/Action.all.xlsx")
     b_npc_names = pd.read_excel("coinach/BNpcName.all.xlsx")
 
-    result = {"en": data}
+    result = {"en": PairData(action={}, bnpcname={})}
+    for act in data.action:
+        result["en"].action[act] = act
+    for bnpc in data.bnpcname:
+        result["en"].bnpcname[bnpc] = bnpc
 
     for i, lang in enumerate(["de", "fr", "ja"]):
-        action = []
-        bnpcname = []
+        action = {}
+        bnpcname = {}
         df = actions.iloc[:, [0, i + 1]]
         for act in data.action:
             row = df[df.iloc[:, 0].str.lower() == act.lower()]
             if row.empty:
                 continue
-            action.append(row.iloc[-1, 1])
+            action[act] = row.iloc[-1, 1]
 
         df = b_npc_names.iloc[:, [0, i + 1]]
         for bnpc in data.bnpcname:
             row = df[df.iloc[:, 0].str.lower() == bnpc.lower()]
             if row.empty:
                 continue
-            bnpcname.append(row.iloc[-1, 1])
-        result[lang] = ParsedData(action=action, bnpcname=bnpcname)
+            bnpcname[bnpc] = row.iloc[-1, 1]
+        result[lang] = PairData(action=action, bnpcname=bnpcname)
 
     return cast(RaidbossDataDict, result)
 
@@ -117,15 +138,19 @@ def to_ts(data: RaidbossDataDict) -> list[str]:
         r.append(f"      'locale': '{lang}',")
         r.append("      'missingTranslations': true,")
         r.append("      'replaceSync': {")
-        for i in range(len(d.bnpcname)):
-            key = en.bnpcname[i].replace("'", "\\'")
-            value = d.bnpcname[i].replace("'", "\\'")
+        for key_raw in sorted(en.bnpcname):
+            key = key_raw.replace("'", "\\'")
+            if key_raw not in d.bnpcname:
+                continue
+            value = d.bnpcname[key_raw].replace("'", "\\'")
             r.append(f"        '{key}': '{value}',")
         r.append("      },")
         r.append("      'replaceText': {")
-        for i in range(len(d.action)):
-            key = en.action[i].replace("'", "\\'")
-            value = d.action[i].replace("'", "\\'")
+        for key_raw in sorted(en.action):
+            key = key_raw.replace("'", "\\'")
+            if key_raw not in d.action:
+                continue
+            value = d.action[key_raw].replace("'", "\\'")
             r.append(f"        '{key}': '{value}',")
         r.append("      },")
         r.append("    },")
