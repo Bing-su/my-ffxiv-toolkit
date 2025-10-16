@@ -51,7 +51,10 @@ def fetch(url: str) -> RaidbossData:
     txt_url = Path(url).with_suffix(".txt").as_posix().replace("https:/", "https://")
 
     ts_data = httpx.get(ts_url).raise_for_status().text
-    txt_data = httpx.get(txt_url).raise_for_status().text
+    try:
+        txt_data = httpx.get(txt_url).raise_for_status().text
+    except httpx.HTTPError:
+        txt_data = ""
     return RaidbossData(ts=ts_data, txt=txt_data)
 
 
