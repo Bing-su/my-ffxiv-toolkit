@@ -1,17 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.taskgroups as taskgroups
 import json
-import sys
 from pathlib import Path
 
 import pandas as pd
 from tqdm.auto import tqdm
-
-if sys.version_info >= (3, 11):
-    import asyncio.taskgroups as taskgroups
-else:
-    import taskgroups as taskgroups
 
 base_url = {
     "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv",
