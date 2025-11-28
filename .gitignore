@@ -129,3 +129,5 @@ data/
 .ruff_cache/
 logs/
 coinach/*.csv
+.pdm-build/
+*.lock
