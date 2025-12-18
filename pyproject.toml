@@ -20,7 +20,7 @@ dependencies = [
 bingkit-ffxiv = "bingkit.ffxiv.__main__:app"
 
 [dependency-groups]
-dev = ["ipykernel", "pre-commit-uv", "ruff"]
+dev = []
 
 [build-system]
 requires = ["pdm-backend"]
