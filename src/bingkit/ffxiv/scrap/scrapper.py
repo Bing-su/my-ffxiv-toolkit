@@ -9,8 +9,8 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 base_url = {
-    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv",
-    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/master/csv",
+    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/en",
+    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/refs/heads/refactor/csv",
 }
 here = Path(__file__).parent
 
@@ -21,7 +21,6 @@ async def read_url(lang: str, name: str, columns: list[str]) -> pd.DataFrame:
         pd.read_csv,
         url,
         usecols=columns,
-        skiprows=[0, 2],
         index_col=0,
         low_memory=False,
     )
