@@ -5,6 +5,9 @@ version: "3"
 vars:
   GREETING: Hello, FFXIV!
 
+env:
+  PYTHONUTF8: "1"
+
 tasks:
   default:
     cmds:
@@ -17,7 +20,7 @@ tasks:
 
   replace:
     cmds:
-      - bingkit-ffxiv replace
+      - bingkit-ffxiv replace {{ .CLI_ARGS }}
 
   rsv:
     cmds:
@@ -29,8 +32,9 @@ tasks:
 
   lint:
     cmds:
-      - pre-commit run -a
+      - prek run -a
 
   update:
     cmds:
+      - prek auto-update
       - uv sync --upgrade --all-extras --all-groups
