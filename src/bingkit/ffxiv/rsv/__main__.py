@@ -47,5 +47,16 @@ def parse_log(file_patterns: list[str], save_path: str | Path | None):
             rsv = parse_rsv_line(line)
             mapping[rsv.key] = rsv.value
 
+    def sort_key(item: tuple[str, str]):
+        return (int(item[0].split("_")[2]), item)
+
+    mapping = dict(sorted(mapping.items(), key=sort_key))
+
     with save_path.open("w", encoding="utf-8") as file:
         json.dump(mapping, file, indent=2, ensure_ascii=False)
+
+    save_txt = save_path.with_suffix(".txt")
+    with save_txt.open("w", encoding="utf-8") as file:
+        for key, value in mapping.items():
+            value = re.sub(r"\s", " ", value)
+            file.write(f"{key}|{value}\n")
