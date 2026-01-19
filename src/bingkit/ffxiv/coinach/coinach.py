@@ -1,32 +1,25 @@
-from __future__ import annotations
-
-import re
-import shutil
-import subprocess
-from functools import cache
+import asyncio
+import io
 from pathlib import Path
-from types import SimpleNamespace
-from urllib.request import urlretrieve
 
-import pandas as pd
+import httpx
+import polars as pl
 from loguru import logger
-from tqdm import tqdm
+from tqdm.asyncio import tqdm
 
-COINACH_PATH = "D:\\SaintCoinach"
-COINACH_EXE = "D:\\SaintCoinach\\SaintCoinach.Cmd.exe"
-KO = "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/master/csv/{name}.csv"
-CN = "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-cn/master/{name}.csv"
-CLIENT_GLOBAL = (
-    "D:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn"
-)
-CLIENT_KO = "C:\\Nexon\\FINAL FANTASY XIV - KOREA"
+BASE_URL: dict[str, str] = {
+    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/en/{name}.csv",
+    "de": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/de/{name}.csv",
+    "fr": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/fr/{name}.csv",
+    "ja": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/ja/{name}.csv",
+    "cn": "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-cn/refs/heads/master/{name}.csv",
+    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/refs/heads/master/csv/{name}.csv",
+    "tc": "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-tc/refs/heads/main/{name}.csv",
+}
 
-LANG = SimpleNamespace()
-LANG.all = ("en", "de", "fr", "ja", "cn", "ko")
-LANG.coinach = LANG.all[:4]
+LANG = tuple(BASE_URL.keys())
 
-
-mapping = {
+mapping: dict[str, list[str]] = {
     "Action": ["Name"],
     "BNpcName": ["Singular"],
     "Balloon": ["Dialogue"],
@@ -42,74 +35,65 @@ mapping = {
 }
 
 
-def fix_game_ver(root: Path, ver: str) -> None:
-    gamever = root.joinpath("Definitions", "game.ver")
-    before = gamever.read_text("utf-8")
-    gamever.write_text(ver, encoding="utf-8")
-    logger.info(f"before: {before!r} → after: {ver!r}")
+async def download_csv(client: httpx.AsyncClient, url: str, output: Path):
+    resp = await client.get(url)
+    resp.raise_for_status()
+    content = resp.text
+    if content.startswith("#"):
+        skip_rows = 0
+        skip_rows_after_header = 0
+    else:
+        skip_rows = 1
+        skip_rows_after_header = 1
+
+    df = await asyncio.to_thread(
+        pl.read_csv,
+        io.StringIO(content),
+        skip_rows=skip_rows,
+        skip_rows_after_header=skip_rows_after_header,
+        infer_schema_length=30000,
+    )
+    df.write_csv(output)
+    logger.info(f"csv saved at {output}")
 
 
-def run_coinach(output: Path, name: str):
-    cmd = [COINACH_EXE, CLIENT_GLOBAL, f"allexd {name}"]
-    subprocess.run(cmd, cwd=COINACH_PATH)
-    ver = get_current_ver(COINACH_PATH)
-    output_dir = Path(COINACH_PATH).joinpath(ver, "exd-all")
-    for output_file in output_dir.glob(f"{name}*.csv"):
-        filename = output_file.name
-        copy_path = output.joinpath(filename)
-        shutil.copyfile(output_file, copy_path)
-        logger.info(f"csv saved at {copy_path}")
-
-
-@cache
-def get_current_ver(path: str | Path) -> str:
-    candidate = []
-    for file in Path(path).iterdir():
-        if re.match(r"\d+", file.name):
-            candidate.append(file.name)
-    if candidate:
-        return max(candidate)
-    msg = "no game ver found"
-    raise RuntimeError(msg)
-
-
-def fetch(output: Path, name: str, add_cn_ko: bool = True):
-    total = len(LANG.all) if add_cn_ko else len(LANG.coinach)
+async def fetch(output: Path, name: str):
+    total = len(LANG)
     pbar = tqdm(total=total)
 
-    run_coinach(output, name)
-    pbar.update(4)
-
-    if not add_cn_ko:
-        return
-
-    for ln, base in [("cn", CN), ("ko", KO)]:
-        url = base.format(name=name)
-        name_with_lang = f"{name}.{ln}.csv"
-        file_path = output.joinpath(name_with_lang)
-        urlretrieve(url, file_path)
-        logger.info(f"csv saved at {file_path}")
-        pbar.update()
+    async with httpx.AsyncClient() as client:
+        async with asyncio.TaskGroup() as tg:
+            for lang, baseurl in BASE_URL.items():
+                url = baseurl.format(name=name)
+                name_with_lang = f"{name}.{lang}.csv"
+                file_path = output.joinpath(name_with_lang)
+                fut = download_csv(client, url, file_path)
+                tg.create_task(fut).add_done_callback(lambda _: pbar.update())
 
     pbar.close()
 
 
 def concat(output: Path, name: str):
     csv_files = list(output.glob(f"{name}*.csv"))
-    csv_files.sort(key=lambda x: LANG.all.index(x.stem.split(".")[-1]))
+    csv_files.sort(key=lambda x: LANG.index(x.stem.split(".")[-1]))
     use_cols = mapping[name]
     dfs = []
     for file in csv_files:
-        df = pd.read_csv(file, skiprows=[0, 2], usecols=use_cols, low_memory=False)
-        ln = file.stem.split("_")[-1]
-        df = df.rename(columns={col: f"{col}_{ln}" for col in df.columns})
+        ln = file.stem.split(".")[-1]
+        df = pl.scan_csv(file).select(use_cols)
+        columns = df.collect_schema().names()
+        df = df.rename(mapping={col: f"{col}_{ln}" for col in columns}).collect()
         dfs.append(df)
-    all_df = pd.concat(dfs, axis=1)
+    all_df = pl.concat(dfs, how="horizontal")
     save_path = output.joinpath(f"{name}.all.xlsx")
-    all_df.to_excel(save_path, index=False)
+    all_df.write_excel(save_path)
+
+
+async def entry(output: Path, name: str):
+    output.mkdir(parents=True, exist_ok=True)
+    await fetch(output, name)
+    concat(output, name)
 
 
 def main(output: Path, name: str):
-    output.mkdir(parents=True, exist_ok=True)
-    fetch(output, name)
-    concat(output, name)
+    asyncio.run(entry(output, name))
