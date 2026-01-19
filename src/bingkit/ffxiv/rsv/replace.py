@@ -1,27 +1,28 @@
-from __future__ import annotations
-
 import asyncio
 import asyncio.taskgroups as taskgroups
 import json
+import os
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
+import polars.selectors as cs
 from tqdm.auto import tqdm
 
 
-def get_rsv_mapping(path: str | Path) -> dict[str, str]:
+def get_rsv_mapping(path: str | os.PathLike[str]) -> dict[str, str]:
     with Path(path).open("rb") as file:
         return json.load(file)
 
 
-async def replace_one(path: str | Path, rsv_mapping: dict[str, str]):
-    df = await asyncio.to_thread(pd.read_excel, path)
-    df.replace(rsv_mapping, inplace=True)
-    await asyncio.to_thread(df.to_excel, path, index=False)
+async def replace_one(path: str | os.PathLike[str], rsv_mapping: dict[str, str]):
+    df = await asyncio.to_thread(pl.read_excel, Path(path))
+    df = df.with_columns(cs.string().replace(rsv_mapping))
+    await asyncio.to_thread(df.write_excel, Path(path))
 
 
 async def replace(
-    data_dir: str | Path | None = None, rsv_path: str | Path | None = None
+    data_dir: str | os.PathLike[str] | None = None,
+    rsv_path: str | os.PathLike[str] | None = None,
 ):
     data_dir = Path("data") if data_dir is None else Path(data_dir)
     rsv_path = Path("rsv.json") if rsv_path is None else Path(rsv_path)
