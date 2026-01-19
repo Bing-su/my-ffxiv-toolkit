@@ -5,25 +5,12 @@ import asyncio.taskgroups as taskgroups
 import json
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 from tqdm.auto import tqdm
 
-base_url = {
-    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/en",
-    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/refs/heads/refactor/csv",
-}
+from bingkit.ffxiv._base import BASE_URL, get_csv
+
 here = Path(__file__).parent
-
-
-async def read_url(lang: str, name: str, columns: list[str]) -> pd.DataFrame:
-    url = f"{base_url[lang]}/{name}.csv"
-    return await asyncio.to_thread(
-        pd.read_csv,
-        url,
-        usecols=columns,
-        index_col=0,
-        low_memory=False,
-    )
 
 
 async def make_df(name: str, columns: list[str], save_dir: Path) -> None:
@@ -33,17 +20,19 @@ async def make_df(name: str, columns: list[str], save_dir: Path) -> None:
     tasks = []
     async with taskgroups.TaskGroup() as tg:
         for lang in langs:
-            coro = read_url(lang, name, columns)
+            usecols = columns if lang == "en" else columns[1:]
+            coro = get_csv(BASE_URL[lang].format(name=name), usecols)
             tasks.append(tg.create_task(coro))
 
-    dfs = [task.result() for task in tasks]
-    for i, lang in enumerate(langs):
-        rename = {col: f"{col}_{lang}" for col in columns}
-        dfs[i].rename(columns=rename, inplace=True)
+    dfs: list[pl.DataFrame] = [task.result() for task in tasks]
+    for i, (lang, df) in enumerate(zip(langs, dfs)):
+        rename = {col: f"{col}_{lang}" for col in df.columns}
+        rename["#"] = "#"
+        dfs[i] = dfs[i].rename(mapping=rename)
 
-    df = pd.concat(dfs, axis=1)
+    df = pl.concat(dfs, how="horizontal")
     save_path = save_dir.joinpath(f"{name}.xlsx")
-    await asyncio.to_thread(df.to_excel, save_path)
+    await asyncio.to_thread(df.write_excel, save_path)
 
 
 async def scrap(
