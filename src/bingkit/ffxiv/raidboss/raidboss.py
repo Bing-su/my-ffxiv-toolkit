@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import TypedDict, cast
 
 import json5
-import pandas as pd
+import polars as pl
 from upath import UPath
 
 ts_object = re.compile(r"\{[^}]*\}")
@@ -33,6 +33,11 @@ class RaidbossDataDict(TypedDict):
     de: PairData
     fr: PairData
     ja: PairData
+    cn: PairData
+    ko: PairData
+
+
+langs = ["en", "de", "fr", "ja", "cn", "ko"]
 
 
 def add_to_set(s: set[str], item: str | list[str]) -> set[str]:
@@ -79,6 +84,8 @@ def parse(data: RaidbossData) -> ParsedData:
             continue
         if "source" in obj:
             bnpcname = add_to_set(bnpcname, obj["source"])
+        if "target" in obj:
+            bnpcname = add_to_set(bnpcname, obj["target"])
 
     for line in data.txt.splitlines():
         if not re.match(r"^\d", line):
@@ -94,15 +101,16 @@ def parse(data: RaidbossData) -> ParsedData:
             except json5.JSON5DecodeError:
                 continue
             if "source" in obj:
-                source = obj["source"]
-                bnpcname = add_to_set(bnpcname, source)
+                bnpcname = add_to_set(bnpcname, obj["source"])
+            if "target" in obj:
+                bnpcname = add_to_set(bnpcname, obj["target"])
 
     return ParsedData(action=sorted(action), bnpcname=sorted(bnpcname))
 
 
 def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
-    actions = pd.read_excel("coinach/Action.all.xlsx")
-    b_npc_names = pd.read_excel("coinach/BNpcName.all.xlsx")
+    actions: pl.DataFrame = pl.read_excel("coinach/Action.all.xlsx")
+    b_npc_names: pl.DataFrame = pl.read_excel("coinach/BNpcName.all.xlsx")
 
     result = {"en": PairData(action={}, bnpcname={})}
     for act in data.action:
@@ -110,22 +118,22 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
     for bnpc in data.bnpcname:
         result["en"].bnpcname[bnpc] = bnpc
 
-    for i, lang in enumerate(["de", "fr", "ja"]):
-        action = {}
-        bnpcname = {}
-        df = actions.iloc[:, [0, i + 1]]
+    for i, lang in enumerate(langs[1:]):
+        action: dict[str, str] = {}
+        bnpcname: dict[str, str] = {}
+        df = actions.select(pl.nth(0, i + 1))
         for act in data.action:
-            row = df[df.iloc[:, 0].str.lower() == act.lower()]
-            if row.empty:
+            row = df.filter(pl.nth(0).str.to_lowercase() == act.lower())
+            if row.is_empty():
                 continue
-            action[act] = row.iloc[-1, 1]
+            action[act] = row.item(-1, 1)
 
-        df = b_npc_names.iloc[:, [0, i + 1]]
+        df = b_npc_names.select(pl.nth(0, i + 1))
         for bnpc in data.bnpcname:
-            row = df[df.iloc[:, 0].str.lower() == bnpc.lower()]
-            if row.empty:
+            row = df.filter(pl.nth(0).str.to_lowercase() == bnpc.lower())
+            if row.is_empty():
                 continue
-            bnpcname[bnpc] = row.iloc[-1, 1]
+            bnpcname[bnpc] = row.item(-1, 1)
         result[lang] = PairData(action=action, bnpcname=bnpcname)
 
     return cast(RaidbossDataDict, result)
@@ -134,7 +142,7 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
 def to_ts(data: RaidbossDataDict) -> list[str]:
     r = []
     en = data["en"]
-    for lang in ["de", "fr", "ja"]:
+    for lang in langs[1:]:
         d = data[lang]
         r.append("    {")
         r.append(f"      'locale': '{lang}',")
