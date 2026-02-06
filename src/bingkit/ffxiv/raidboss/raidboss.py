@@ -1,11 +1,10 @@
 import re
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TypedDict, cast
 
-import httpx
 import json5
 import pandas as pd
+from upath import UPath
 
 ts_object = re.compile(r"\{[^}]*\}")
 quoted = re.compile(r"\"([^\"]+)\"")
@@ -47,13 +46,13 @@ def add_to_set(s: set[str], item: str | list[str]) -> set[str]:
 
 
 def fetch(url: str) -> RaidbossData:
-    ts_url = Path(url).with_suffix(".ts").as_posix().replace("https:/", "https://")
-    txt_url = Path(url).with_suffix(".txt").as_posix().replace("https:/", "https://")
+    ts_url = UPath(url).with_suffix(".ts")
+    txt_url = UPath(url).with_suffix(".txt")
 
-    ts_data = httpx.get(ts_url).raise_for_status().text
+    ts_data = ts_url.read_text(encoding="utf-8")
     try:
-        txt_data = httpx.get(txt_url).raise_for_status().text
-    except httpx.HTTPError:
+        txt_data = txt_url.read_text(encoding="utf-8")
+    except FileNotFoundError:
         txt_data = ""
     return RaidbossData(ts=ts_data, txt=txt_data)
 
