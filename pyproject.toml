@@ -6,14 +6,16 @@ requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
-  "httpx",
+  "fsspec[http]",
+  "httpx[http2,zstd]",
   "json-five",
   "loguru",
   "pandas[excel]",
   "polars[pandas,fsspec,excel]",
   "tqdm",
   "typer",
-  "winloop; platform_system == 'Windows'",
+  "universal_pathlib",
+  "winloop; platform_system == 'Windows'"
 ]
 
 [project.scripts]
