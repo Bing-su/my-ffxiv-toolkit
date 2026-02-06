@@ -8,6 +8,8 @@ from upath import UPath
 
 ts_object = re.compile(r"\{[^}]*\}")
 quoted = re.compile(r"\"([^\"]+)\"")
+multiplier = re.compile(r"\s*x\d+$")
+label = re.compile(r"^\d+(?:\.\d+)?\s*label")
 
 
 @dataclass
@@ -88,12 +90,13 @@ def parse(data: RaidbossData) -> ParsedData:
             bnpcname = add_to_set(bnpcname, obj["target"])
 
     for line in data.txt.splitlines():
-        if not re.match(r"^\d", line):
+        if not re.match(r"^\d", line) or label.match(line):
             continue
         m1 = quoted.search(line)
         if m1:
             s = pp_action(m1.group(1))
             action = add_to_set(action, s)
+        action = {multiplier.sub("", a) for a in action}
         m2 = ts_object.search(line)
         if m2:
             try:
@@ -125,15 +128,17 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
         for act in data.action:
             row = df.filter(pl.nth(0).str.to_lowercase() == act.lower())
             if row.is_empty():
-                continue
-            action[act] = row.item(-1, 1)
+                action[act] = ""
+            else:
+                action[act] = row.item(-1, 1)
 
         df = b_npc_names.select(pl.nth(0, i + 1))
         for bnpc in data.bnpcname:
             row = df.filter(pl.nth(0).str.to_lowercase() == bnpc.lower())
             if row.is_empty():
-                continue
-            bnpcname[bnpc] = row.item(-1, 1)
+                bnpcname[bnpc] = ""
+            else:
+                bnpcname[bnpc] = row.item(-1, 1)
         result[lang] = PairData(action=action, bnpcname=bnpcname)
 
     return cast(RaidbossDataDict, result)
