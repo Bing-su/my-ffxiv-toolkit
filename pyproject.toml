@@ -10,7 +10,7 @@ dependencies = [
   "httpr",
   "json-five",
   "loguru",
-  "polars[pandas,fsspec,excel]",
+  "polars[fsspec,excel]",
   "tqdm",
   "typer",
   "universal_pathlib",
