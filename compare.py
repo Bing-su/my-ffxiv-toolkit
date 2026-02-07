@@ -45,8 +45,16 @@ def compare(
     outputs = open(output_file, "w", encoding="utf-8")
 
     pattern = re.compile(r"(?P<space> *)'(?P<en>.*?)': '.*',")
+    is_action_line = False
 
     for line in inputs:
+        if "replaceText" in line:
+            is_action_line = True
+
+        if (is_action_line and (npc or place)) or (not is_action_line and action):
+            outputs.write(line)
+            continue
+
         if m := pattern.search(line):
             en_name_raw = m.group("en")
             en_name = en_name_raw.replace("\\'", "'").replace("Pandaemon", "Pandæmon")
