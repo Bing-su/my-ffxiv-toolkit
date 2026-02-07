@@ -1,7 +1,7 @@
 import asyncio
 import io
 
-import httpx
+import httpr
 import polars as pl
 
 BASE_URL: dict[str, str] = {
@@ -36,9 +36,10 @@ async def get_csv(
     url: str,
     columns: list[str] | None = None,
 ):
-    async with httpx.AsyncClient() as client:
+    async with httpr.AsyncClient() as client:
         resp = await client.get(url)
-    resp.raise_for_status()
+    if resp.status_code != 200:
+        raise ValueError(f"Failed to fetch CSV from {url}: {resp.status_code}")
     content = resp.text
     if content.startswith("#"):
         skip_rows = 0

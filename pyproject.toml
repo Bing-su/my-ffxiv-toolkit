@@ -1,16 +1,15 @@
 [project]
 name = "bingkit-ffxiv"
-version = "0.5.0"
+version = "0.6.0"
 description = "개인용 FF14 툴킷"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = "MIT"
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
   "fsspec[http]",
-  "httpx[http2,zstd]",
+  "httpr",
   "json-five",
   "loguru",
-  "pandas[excel]",
   "polars[pandas,fsspec,excel]",
   "tqdm",
   "typer",
@@ -25,8 +24,8 @@ bingkit-ffxiv = "bingkit.ffxiv.__main__:app"
 dev = []
 
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["uv_build"]
+build-backend = "uv_build"
 
 [tool.isort]
 profile = "black"
@@ -38,3 +37,6 @@ unfixable = ["F401"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/bingkit/ffxiv/__main__.py" = ["FA100", "FA102"]
+
+[tool.uv.build-backend]
+module-name = "bingkit.ffxiv"
