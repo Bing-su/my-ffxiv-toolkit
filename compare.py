@@ -2,7 +2,7 @@ import argparse
 import os
 import re
 
-import pandas as pd
+import polars as pl
 from tqdm.auto import tqdm
 
 
@@ -27,15 +27,15 @@ def compare(
         action = True
 
     if npc:
-        data = pd.read_excel("data/BNpcName.xlsx")
+        data: pl.DataFrame = pl.read_excel("data/BNpcName.xlsx")
         col_en = "Singular_en"
         col_ko = "Singular_ko"
     elif place:
-        data = pd.read_excel("data/PlaceName.xlsx")
+        data: pl.DataFrame = pl.read_excel("data/PlaceName.xlsx")
         col_en = "Name_en"
         col_ko = "Name_ko"
     elif action:
-        data = pd.read_excel("data/Action.xlsx")
+        data: pl.DataFrame = pl.read_excel("data/Action.xlsx")
         col_en = "Name_en"
         col_ko = "Name_ko"
     else:
@@ -51,20 +51,19 @@ def compare(
             en_name_raw = m.group("en")
             en_name = en_name_raw.replace("\\'", "'").replace("Pandaemon", "Pandæmon")
             en_name = re.sub(r"\(.*\)", "", en_name)
-            lower_data = data[col_en].str.lower()
-            data_index = (
-                (lower_data == en_name.lower())
-                & (data[col_ko].notna())
-                & ~(data[col_ko].str.startswith("_rsv_", na=False))
+            match_skills = data.filter(
+                (pl.col(col_en).str.to_lowercase() == en_name.lower())
+                & pl.col(col_ko).is_not_null()
+                & pl.col(col_ko).ne(pl.lit(""))
+                & ~pl.col(col_ko).str.starts_with("_rsv_")
             )
-            match_skills = data[data_index]
 
-            if len(match_skills) == 0:
+            if match_skills.is_empty():
                 outputs.write(line)
                 continue
 
             len_space = len(m.group("space"))
-            ko_name = match_skills.iloc[-1][col_ko]
+            ko_name = match_skills.item(-1, col_ko)
             if "_rsv_" in ko_name:
                 ko_name = en_name_raw
             row = " " * len_space + f"'{en_name_raw}': '{ko_name}',\n"
