@@ -40,6 +40,19 @@ class RaidbossDataDict(TypedDict):
 
 
 langs = ["en", "de", "fr", "ja", "cn", "ko"]
+npc_name_keys = ["name", "source", "target"]
+
+
+def german_substitute(name: str) -> str:
+    mapping = {
+        "[t]": "(?:der|die|das)",
+        "[a]": "(?:e|er|es|en)",
+        "[A]": "(?:e|er|es|en)",
+        "[p]": "",
+    }
+    for k, v in mapping.items():
+        name = name.replace(k, v)
+    return name
 
 
 def add_to_set(s: set[str], item: str | list[str]) -> set[str]:
@@ -84,10 +97,9 @@ def parse(data: RaidbossData) -> ParsedData:
             obj = json5.loads(m.group())
         except json5.JSON5DecodeError:
             continue
-        if "source" in obj:
-            bnpcname = add_to_set(bnpcname, obj["source"])
-        if "target" in obj:
-            bnpcname = add_to_set(bnpcname, obj["target"])
+        for key in npc_name_keys:
+            if key in obj:
+                bnpcname = add_to_set(bnpcname, obj[key])
 
     for line in data.txt.splitlines():
         if not re.match(r"^\d", line) or label.match(line):
@@ -103,10 +115,9 @@ def parse(data: RaidbossData) -> ParsedData:
                 obj = json5.loads(m2.group())
             except json5.JSON5DecodeError:
                 continue
-            if "source" in obj:
-                bnpcname = add_to_set(bnpcname, obj["source"])
-            if "target" in obj:
-                bnpcname = add_to_set(bnpcname, obj["target"])
+            for key in npc_name_keys:
+                if key in obj:
+                    bnpcname = add_to_set(bnpcname, obj[key])
 
     return ParsedData(action=sorted(action), bnpcname=sorted(bnpcname))
 
@@ -139,6 +150,8 @@ def to_i18n_data(data: ParsedData) -> RaidbossDataDict:
                 bnpcname[bnpc] = ""
             else:
                 bnpcname[bnpc] = row.item(-1, 1)
+            if lang == "de":
+                bnpcname[bnpc] = german_substitute(bnpcname[bnpc])
         result[lang] = PairData(action=action, bnpcname=bnpcname)
 
     return cast(RaidbossDataDict, result)

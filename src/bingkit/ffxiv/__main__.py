@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Annotated
 
 from typer import Argument, Option, Typer
+from upath import UPath
 
 from bingkit.ffxiv.coinach import coinach as _coinach
 from bingkit.ffxiv.raidboss import raidboss as _raidboss
@@ -61,9 +62,23 @@ def coinach(
 @app.command()
 def raidboss(
     url: Annotated[str, Argument(help="파싱할 Cactbot raw content URL")],
+    output: Annotated[
+        str | None,
+        Option(
+            "-o",
+            "--output",
+            help="결과를 저장할 파일 이름, - 일 경우 표준 출력, None일 경우 현재 경로에 입력 파일 이름으로 저장",
+        ),
+    ] = None,
 ):
     result = _raidboss(url)
-    print(result)
+    if output == "-":
+        print(result)
+    elif not output:
+        filename = UPath(url).name
+        UPath(filename).write_text(result, encoding="utf-8")
+    else:
+        UPath(output).write_text(result, encoding="utf-8")
 
 
 if __name__ == "__main__":
