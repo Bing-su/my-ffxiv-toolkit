@@ -37,9 +37,10 @@ class RaidbossDataDict(TypedDict):
     ja: PairData
     cn: PairData
     ko: PairData
+    tc: PairData
 
 
-langs = ["en", "de", "fr", "ja", "cn", "ko"]
+langs = ["en", "de", "fr", "ja", "cn", "ko", "tc"]
 npc_name_keys = ["name", "source", "target"]
 
 
@@ -168,7 +169,7 @@ def to_ts(data: RaidbossDataDict) -> list[str]:
         r.append("      'replaceSync': {")
         for key_raw in sorted(en.bnpcname):
             key = key_raw.replace("'", "\\'")
-            if key_raw not in d.bnpcname:
+            if d.bnpcname.get(key_raw) is None:
                 continue
             value = d.bnpcname[key_raw].replace("'", "\\'")
             r.append(f"        '{key}': '{value}',")
@@ -176,7 +177,7 @@ def to_ts(data: RaidbossDataDict) -> list[str]:
         r.append("      'replaceText': {")
         for key_raw in sorted(en.action):
             key = key_raw.replace("'", "\\'")
-            if key_raw not in d.action:
+            if d.action.get(key_raw) is None:
                 continue
             value = d.action[key_raw].replace("'", "\\'")
             r.append(f"        '{key}': '{value}',")
