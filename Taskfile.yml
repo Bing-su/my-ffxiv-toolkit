@@ -38,3 +38,9 @@ tasks:
     cmds:
       - prek auto-update
       - uv sync --upgrade --all-extras --all-groups
+
+  update:coinach:
+    cmds:
+      - bingkit-ffxiv coinach Action
+      - bingkit-ffxiv coinach BNpcName
+      - rm -f coinach/*.csv
