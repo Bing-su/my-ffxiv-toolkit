@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from typing import Annotated
 
-from typer import Argument, Option, Typer
+from cyclopts import App, Parameter
 from upath import UPath
 
 from bingkit.ffxiv.coinach import coinach as _coinach
@@ -11,14 +11,19 @@ from bingkit.ffxiv.rsv import parse_log as _parse_log
 from bingkit.ffxiv.rsv import replace as _replace
 from bingkit.ffxiv.scrap import scrap as _scrap
 
-app = Typer(no_args_is_help=True)
+app = App(help_on_error=True)
 
 
-@app.command(no_args_is_help=True)
+@app.command
 def rsv(
-    files: Annotated[list[str], Argument(help="분석할 log 파일 목록")],
+    files: Annotated[list[str], Parameter(help="분석할 log 파일 목록")],
     save_path: Annotated[
-        str | None, Option("-s", "--save-path", help="결과를 저장할 파일 이름")
+        str | None,
+        Parameter(
+            ["-s", "--save-path"],
+            help="결과를 저장할 파일 이름",
+            show_default=lambda _: "rsv.json",
+        ),
     ] = None,
 ):
     _parse_log(files, save_path)
@@ -28,10 +33,15 @@ def rsv(
 def scrap(
     config_path: Annotated[
         str | None,
-        Option("-c", "--config-path", help="다운로드 설정 json 파일 경로"),
+        Parameter(["-c", "--config-path"], help="다운로드 설정 json 파일 경로"),
     ] = None,
     save_dir: Annotated[
-        str | None, Option("-d", "--save-dir", help="파일들을 저장할 폴더")
+        str | None,
+        Parameter(
+            ["-d", "--save-dir"],
+            help="파일들을 저장할 폴더",
+            show_default=lambda _: "data",
+        ),
     ] = None,
 ):
     asyncio.run(_scrap(config_path, save_dir))
@@ -40,10 +50,20 @@ def scrap(
 @app.command()
 def replace(
     data_dir: Annotated[
-        str | None, Option("-d", "--data-dir", help="데이터 파일을 담은 폴더 경로")
+        str | None,
+        Parameter(
+            ["-d", "--data-dir"],
+            help="데이터 파일을 담은 폴더 경로",
+            show_default=lambda _: "data",
+        ),
     ] = None,
     rsv_path: Annotated[
-        str | None, Option("-r", "--rsv-path", help="RSV 정보를 담은 json 파일")
+        str | None,
+        Parameter(
+            ["-r", "--rsv-path"],
+            help="RSV 정보를 담은 json 파일",
+            show_default=lambda _: "rsv.json",
+        ),
     ] = None,
 ):
     asyncio.run(_replace(data_dir, rsv_path))
@@ -51,9 +71,9 @@ def replace(
 
 @app.command()
 def coinach(
-    name: Annotated[str, Argument(help="가져올 EXD 이름")],
+    name: Annotated[str, Parameter(help="가져올 EXD 이름")],
     output: Annotated[
-        Path, Option("-o", "--output", help="결과를 저장할 폴더 경로")
+        Path, Parameter(["-o", "--output"], help="결과를 저장할 폴더 경로")
     ] = Path("coinach"),
 ):
     _coinach(output, name)
@@ -61,12 +81,11 @@ def coinach(
 
 @app.command()
 def raidboss(
-    url: Annotated[str, Argument(help="파싱할 Cactbot raw content URL")],
+    url: Annotated[str, Parameter(help="파싱할 Cactbot raw content URL")],
     output: Annotated[
         str | None,
-        Option(
-            "-o",
-            "--output",
+        Parameter(
+            ["-o", "--output"],
             help="결과를 저장할 파일 이름, - 일 경우 표준 출력, None일 경우 현재 경로에 입력 파일 이름으로 저장",
         ),
     ] = None,

@@ -1,20 +1,20 @@
 [project]
 name = "bingkit-ffxiv"
-version = "0.6.0"
+version = "0.7.0"
 description = "개인용 FF14 툴킷"
 requires-python = ">=3.12"
 license = "MIT"
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
+  "cyclopts",
   "fsspec[http]",
   "httpr",
   "json-five",
   "loguru",
   "polars[fsspec,excel]",
   "tqdm",
-  "typer",
   "universal_pathlib",
-  "winloop; platform_system == 'Windows'"
+  "winloop; platform_system == 'Windows'",
 ]
 
 [project.scripts]

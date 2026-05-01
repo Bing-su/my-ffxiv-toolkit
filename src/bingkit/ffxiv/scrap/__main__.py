@@ -9,11 +9,11 @@ def cli():
 
 
 if __name__ == "__main__":
-    import typer
+    import cyclopts
 
     if platform.system() == "Windows":
         import winloop
 
         winloop.install()
 
-    typer.run(cli)
+    cyclopts.run(cli)
