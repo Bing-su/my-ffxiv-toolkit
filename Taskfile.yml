@@ -15,6 +15,7 @@ tasks:
     silent: true
 
   fetch:
+    aliases: [scrap]
     cmds:
       - bingkit-ffxiv scrap
 
@@ -44,3 +45,7 @@ tasks:
       - bingkit-ffxiv coinach Action
       - bingkit-ffxiv coinach BNpcName
       - rm -f coinach/*.csv
+
+  raidboss:
+    cmds:
+      - bingkit-ffxiv raidboss {{ .CLI_ARGS }}
