@@ -9,11 +9,10 @@ BASE_URL: dict[str, str] = {
     "de": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/de/{name}.csv",
     "fr": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/fr/{name}.csv",
     "ja": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/ja/{name}.csv",
-    "cn": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/chs/{name}.csv",
-    "ko": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/ko/{name}.csv",
+    "cn": "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-cn/refs/heads/master/{name}.csv",
+    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/refs/heads/master/csv/{name}.csv",
     "tc": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/tc/{name}.csv",
 }
-
 LANG = tuple(BASE_URL.keys())
 
 SHEETS: dict[str, list[str]] = {
