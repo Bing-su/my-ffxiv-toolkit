@@ -5,13 +5,13 @@ import httpr
 import polars as pl
 
 BASE_URL: dict[str, str] = {
-    "en": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/en/{name}.csv",
-    "de": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/de/{name}.csv",
-    "fr": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/fr/{name}.csv",
-    "ja": "https://raw.githubusercontent.com/xivapi/ffxiv-datamining/refs/heads/master/csv/ja/{name}.csv",
-    "cn": "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-cn/refs/heads/master/{name}.csv",
-    "ko": "https://raw.githubusercontent.com/Ra-Workspace/ffxiv-datamining-ko/refs/heads/master/csv/{name}.csv",
-    "tc": "https://raw.githubusercontent.com/thewakingsands/ffxiv-datamining-tc/refs/heads/main/{name}.csv",
+    "en": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/en/{name}.csv",
+    "de": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/de/{name}.csv",
+    "fr": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/fr/{name}.csv",
+    "ja": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/ja/{name}.csv",
+    "cn": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/chs/{name}.csv",
+    "ko": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/ko/{name}.csv",
+    "tc": "https://raw.githubusercontent.com/skyborn-industries/xiv-data/refs/heads/main/exd/tc/{name}.csv",
 }
 
 LANG = tuple(BASE_URL.keys())
