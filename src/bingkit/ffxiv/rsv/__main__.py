@@ -19,7 +19,8 @@ def is_rsv_line(line: str) -> bool:
 
 def parse_rsv_line(line: str) -> RSVData:
     _net, _time, _lang, _id, key, value, _hash = line.split("|")
-    value = re.sub(r"[]+", "\n", value)
+    value = re.sub(r"\u0002\u0010\u0001\u0003", "\n", value)
+    value = re.sub(r"[\u0001-\u0009]+|[\u0011-\u001f]+", " ", value)
     return RSVData(key, value)
 
 
