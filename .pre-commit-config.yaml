@@ -16,12 +16,12 @@ repos:
         types_or: [json, markdown, yaml]
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
       - id: tombi-format
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
+    rev: v0.15.16
     hooks:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
