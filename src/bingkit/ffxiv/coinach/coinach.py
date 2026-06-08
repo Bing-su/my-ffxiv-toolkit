@@ -1,8 +1,10 @@
 import asyncio
+import json
 import os
 from pathlib import Path
 
 import polars as pl
+import polars.selectors as cs
 from loguru import logger
 from tqdm.asyncio import tqdm
 
@@ -42,6 +44,10 @@ def concat(output: Path, name: str):
         df = df.rename(mapping={col: f"{col}_{ln}" for col in columns}).collect()
         dfs.append(df)
     all_df = pl.concat(dfs, how="horizontal")
+    rsv_path = Path.cwd().joinpath("rsv.json")
+    if rsv_path.exists():
+        rsv_mapping = json.loads(rsv_path.read_bytes())
+        all_df = all_df.with_columns(cs.string().replace(rsv_mapping))
     save_path = output.joinpath(f"{name}.all.xlsx")
     all_df.write_excel(save_path)
 
