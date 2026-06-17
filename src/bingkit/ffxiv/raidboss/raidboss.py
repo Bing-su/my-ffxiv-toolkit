@@ -120,6 +120,8 @@ def parse(data: RaidbossData) -> ParsedData:
                 if key in obj:
                     bnpcname = add_to_set(bnpcname, obj[key])
 
+    action = {a for a in action if a}
+    bnpcname = {name for name in bnpcname if name}
     return ParsedData(action=sorted(action), bnpcname=sorted(bnpcname))
 
 
