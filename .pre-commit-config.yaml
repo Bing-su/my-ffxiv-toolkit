@@ -10,7 +10,7 @@ repos:
       - id: mixed-line-ending
 
   - repo: https://github.com/oxc-project/mirrors-oxfmt
-    rev: v0.53.0
+    rev: v0.54.0
     hooks:
       - id: oxfmt
         types_or: [json, markdown, yaml]
@@ -21,7 +21,7 @@ repos:
       - id: tombi-format
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.16
+    rev: v0.15.17
     hooks:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
