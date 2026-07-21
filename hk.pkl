@@ -1,0 +1,29 @@
+amends "package://github.com/jdx/hk/releases/download/v1.51.0/hk@1.51.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.51.0/hk@1.51.0#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+    ["trailing-whitespace"] = Builtins.trailing_whitespace
+    ["newlines"] = Builtins.newlines
+    ["mixed-line-ending"] = Builtins.mixed_line_ending
+
+    ["oxfmt"] = Builtins.oxfmt {
+        types = List("json", "yaml", "markdown")
+    }
+    ["tombi-format"] = Builtins.tombi_format
+    ["ruff-format"] = Builtins.ruff_format
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        stash = "git"
+        steps = linters
+    }
+    ["fix"] {
+        fix = true
+        steps = linters
+    }
+    ["check"] {
+        steps = linters
+    }
+}
