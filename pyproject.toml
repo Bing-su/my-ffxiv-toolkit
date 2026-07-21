@@ -8,7 +8,7 @@ authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
   "cyclopts",
   "fsspec[http]",
-  "httpr",
+  "httpr>=0.5.2",
   "json-five",
   "loguru",
   "polars[fsspec,excel]",

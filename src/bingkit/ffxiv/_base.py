@@ -31,14 +31,15 @@ SHEETS: dict[str, list[str]] = {
 }
 
 
+_client = httpr.AsyncClient()
+
+
 async def get_csv(
     url: str,
     columns: list[str] | None = None,
 ):
-    async with httpr.AsyncClient() as client:
-        resp = await client.get(url)
-    if resp.status_code != 200:
-        raise ValueError(f"Failed to fetch CSV from {url}: {resp.status_code}")
+    resp = await _client.get(url)
+    resp.raise_for_status()
     content = resp.text
     if content.startswith("#"):
         skip_rows = 0
