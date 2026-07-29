@@ -10,6 +10,7 @@ local linters = new Mapping<String, Step> {
         types = List("json", "yaml", "markdown")
     }
     ["tombi-format"] = Builtins.tombi_format
+    ["ruff-check"] = Builtins.ruff
     ["ruff-format"] = Builtins.ruff_format
 }
 
