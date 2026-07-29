@@ -33,11 +33,10 @@ tasks:
 
   lint:
     cmds:
-      - prek run -a
+      - hk run fix -a
 
   update:
     cmds:
-      - prek auto-update
       - uv sync --upgrade --all-extras --all-groups
 
   update:coinach:
