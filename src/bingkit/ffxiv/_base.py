@@ -28,6 +28,7 @@ SHEETS: dict[str, list[str]] = {
     "PlaceName": ["Name"],
     "PublicContentTextData": ["TextData"],
     "Status": ["Name", "Description"],
+    "MKDLore": ["Name", "Description"],
 }
 
 
