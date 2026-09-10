@@ -1,9 +1,10 @@
 [project]
 name = "bingkit-ffxiv"
-version = "0.7.0"
+version = "0.8.0"
 description = "개인용 FF14 툴킷"
 requires-python = ">=3.12"
-license = "MIT"
+license = "BlueOak-1.0.0 AND LicenseRef-FINAL-FANTASY-XIV-Materials-Usage-License"
+license-files = ["FINAL_FANTASY_XIV_Materials_Usage_License.md", "LICENSE.md"]
 authors = [{ name = "Bingsu", email = "ks2515@naver.com" }]
 dependencies = [
   "cyclopts",
