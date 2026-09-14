@@ -3,6 +3,8 @@ from typing import Any
 
 import httpr
 
+from .model import Fight, FightsResponse
+
 BASE_URL = "https://www.fflogs.com/v1"
 FFLOGS_API_KEY_ENV = "FFLOGS_API_KEY"
 
@@ -12,15 +14,16 @@ _client = httpr.Client()
 def _api_key(api_key: str | None = None) -> str:
     key = api_key or os.getenv(FFLOGS_API_KEY_ENV)
     if not key:
-        raise ValueError("FFLOGS API key is required")
+        msg = "FFLOGS API key is required"
+        raise ValueError(msg)
     return key
 
 
-def get_fight(report_code: str, fight_id: int, api_key: str | None = None):
+def get_fight(report_code: str, fight_id: int, api_key: str | None = None) -> Fight:
     api_key = _api_key(api_key)
     url = f"{BASE_URL}/report/fights/{report_code}"
     resp = _client.get(url, params={"api_key": api_key, "translate": "false"})
-    data = resp.raise_for_status().json()
+    data: FightsResponse = resp.raise_for_status().json()
     for fight in data["fights"]:
         if fight["id"] == fight_id:
             return fight
@@ -65,9 +68,8 @@ def get_all_fight_events(
             break
 
         if next_timestamp <= start:
-            raise RuntimeError(
-                f"pagination did not advance: {start = } {next_timestamp = }"
-            )
+            msg = f"pagination did not advance: {start = } {next_timestamp = }"
+            raise RuntimeError(msg)
 
         start = next_timestamp
 
