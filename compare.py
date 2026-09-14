@@ -41,8 +41,8 @@ def compare(
     else:
         raise ValueError
 
-    inputs = open(input_file, encoding="utf-8")
-    outputs = open(output_file, "w", encoding="utf-8")
+    inputs = open(input_file, encoding="utf-8")  # noqa: SIM115
+    outputs = open(output_file, "w", encoding="utf-8")  # noqa: SIM115
 
     pattern = re.compile(r"(?P<space> *)'(?P<en>.*?)': '.*',")
     is_action_line = False

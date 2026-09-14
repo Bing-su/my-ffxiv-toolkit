@@ -28,7 +28,7 @@ def convert_files(patterns: list[str]) -> list[Path]:
     return [
         p
         for pattern in patterns
-        for file in glob.glob(pattern)  # noqa: PTH207
+        for file in glob.glob(pattern)
         if (p := Path(file)).is_file()
     ]
 

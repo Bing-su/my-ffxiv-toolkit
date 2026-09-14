@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import asyncio.taskgroups as taskgroups
 import json
+from asyncio import taskgroups
 from pathlib import Path
 
 import polars as pl

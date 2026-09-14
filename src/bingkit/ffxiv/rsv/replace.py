@@ -1,7 +1,7 @@
 import asyncio
-import asyncio.taskgroups as taskgroups
 import json
 import os
+from asyncio import taskgroups
 from pathlib import Path
 
 import polars as pl

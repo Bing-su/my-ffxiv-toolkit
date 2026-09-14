@@ -15,7 +15,6 @@ dependencies = [
   "polars[fsspec,excel]",
   "tqdm",
   "universal_pathlib",
-  "winloop; platform_system == 'Windows'",
 ]
 
 [project.scripts]
@@ -32,7 +31,7 @@ build-backend = "uv_build"
 profile = "black"
 
 [tool.ruff.lint]
-select = ["A", "B", "C4", "E", "F", "I001", "N", "PT", "UP", "W"]
+extend-select = ["A", "B", "C4", "E", "F", "I001", "N", "PT", "UP", "W"]
 ignore = ["B008", "B905", "E501"]
 unfixable = ["F401"]
 
