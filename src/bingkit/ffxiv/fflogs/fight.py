@@ -1,9 +1,9 @@
 import os
-from typing import Any
 
 import httpr
 
-from .model import Fight, FightsResponse
+from .model.fights import Fight, FightsResponse
+from .model.summary import Event, SummaryResponse
 
 BASE_URL = "https://www.fflogs.com/v1"
 FFLOGS_API_KEY_ENV = "FFLOGS_API_KEY"
@@ -35,7 +35,7 @@ def get_all_fight_events(
     report_code: str,
     fight_id: int,
     api_key: str | None = None,
-) -> list[dict[str, Any]]:
+) -> list[Event]:
     fight = get_fight(
         report_code,
         fight_id,
@@ -45,7 +45,7 @@ def get_all_fight_events(
     start: int = fight["start_time"]
     end: int = fight["end_time"]
 
-    events: list[dict[str, Any]] = []
+    events: list[Event] = []
 
     while start < end:
         resp = _client.get(
@@ -58,7 +58,7 @@ def get_all_fight_events(
             },
         )
 
-        data = resp.raise_for_status().json()
+        data: SummaryResponse = resp.raise_for_status().json()
 
         events.extend(data.get("events", []))
 
