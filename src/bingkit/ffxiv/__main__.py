@@ -1,11 +1,12 @@
 import asyncio
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from cyclopts import App, Parameter
 from upath import UPath
 
 from bingkit.ffxiv.coinach import coinach as _coinach
+from bingkit.ffxiv.fflogs import get_all_fight_events as _get_all_fight_events
 from bingkit.ffxiv.raidboss import raidboss as _raidboss
 from bingkit.ffxiv.rsv import parse_log as _parse_log
 from bingkit.ffxiv.rsv import replace as _replace
@@ -98,6 +99,52 @@ def raidboss(
         UPath(filename).write_text(result, encoding="utf-8")
     else:
         UPath(output).write_text(result, encoding="utf-8")
+
+
+@app.command()
+def fflogs(
+    report_code: Annotated[str, Parameter(help="FFLogs report code")],
+    fight_id: Annotated[int, Parameter(help="Fight ID within the report")],
+    api_key: Annotated[
+        str | None,
+        Parameter(
+            ["-k", "--api-key"],
+            env_var="FFLOGS_API_KEY",
+            help="FFLogs API key",
+        ),
+    ] = None,
+    output: Annotated[
+        Path | None,
+        Parameter(
+            ["-o", "--output"],
+            help="결과를 저장할 파일 이름, None일 경우 현재 경로에 {report_code}_{fight_id}.{format} 형태로 저장",
+        ),
+    ] = None,
+    format_: Annotated[
+        Literal["json", "ndjson", "parquet"],
+        Parameter(
+            ["-f", "--format"],
+            help="출력 파일 형식",
+            show_default=True,
+        ),
+    ] = "json",
+):
+    import polars as pl
+
+    events = _get_all_fight_events(report_code, fight_id, api_key)
+    df = pl.DataFrame(events)
+    # Polars에서 UPath 지원 안됨
+    output = output or Path(f"{report_code}_{fight_id}.{format_}")
+    match format_:
+        case "json":
+            df.write_json(output)
+        case "ndjson":
+            df.write_ndjson(output)
+        case "parquet":
+            df.write_parquet(output)
+        case _:
+            msg = f"Unsupported format: {format_}"
+            raise ValueError(msg)
 
 
 if __name__ == "__main__":
