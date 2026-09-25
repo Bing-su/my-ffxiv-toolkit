@@ -55,6 +55,7 @@ def get_all_fight_events(
                 "start": start,
                 "end": end,
                 "translate": "false",
+                "hostility": 1,
             },
         )
 
